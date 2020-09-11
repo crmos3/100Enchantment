@@ -14,12 +14,16 @@ namespace Enchantment
     [HarmonyPatch("CraftItem")]
     class Patch
     {
-        static bool Prefix(OcItemDataMng __instance, int itemId, int level, List<OcItem> materialList, List<int> materialCount, ref OcItem __result)
+        static bool Prefix()
+        {
+            return false;
+        }
+
+        static void Postfix(OcItemDataMng __instance, int itemId, int level, List<OcItem> materialList, List<int> materialCount, ref OcItem __result)
         {
             if (materialList.IsNullOrEmpty<OcItem>())
             {
                 __result = __instance.CreateItem(itemId, level);
-                return false;
             }
 
             List<int> list = new List<int>();
@@ -30,12 +34,17 @@ namespace Enchantment
                 OcItem ocItem = materialList[i];
                 for (int j = 0; j < ocItem.EnchantNum; j++)
                 {
-                    list.Add(ocItem.GetEnchant(j).Source.ID);
+                    var sid = ocItem.GetEnchant(j).Source.ID;
+                    if (sid != 0 && !(nonInheritables.FirstOrDefault((SoEnchantment source) => source.ID == sid) != null))
+                    {
+                        list.Add(sid);
+                    }
                 }
             }
-
+            
             int[] selectEnchantment = new int[4];
-            for(int i = 0; i < Math.Min(list.Count, 4); i++)
+            int enchantNumber = Math.Min(list.Count, 4);
+            for (int i = 0; i < enchantNumber; i++)
             {
                 var randomIndex = UnityEngine.Random.Range(0, list.Count - 1);
                 selectEnchantment[i] = list[randomIndex];
@@ -45,7 +54,6 @@ namespace Enchantment
                                  orderby Guid.NewGuid()
                                  select a).ToArray<int>();
             __result = __instance.CreateItem(itemId, level, selectEnchantment);
-            return false;
         }
 
     }

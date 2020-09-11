@@ -4,7 +4,7 @@ using HarmonyLib;
 namespace Enchantment
 {
     [BepInPlugin("com.example.EnchantPlugin", "EnchantmentPlugin", "1.0.0.0")]
-    public class Patcher
+    public class Patcher : BaseUnityPlugin
     {
         void Awake()
         {
