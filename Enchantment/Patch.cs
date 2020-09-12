@@ -37,7 +37,10 @@ namespace Enchantment
                     var sid = ocItem.GetEnchant(j).Source.ID;
                     if (sid != 0 && !(nonInheritables.FirstOrDefault((SoEnchantment source) => source.ID == sid) != null))
                     {
-                        list.Add(sid);
+                        if (!list.Contains(sid))
+                        {
+                            list.Add(sid);
+                        }
                     }
                 }
             }
